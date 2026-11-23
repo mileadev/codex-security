@@ -13785,7 +13785,9 @@ export function parseCodexOverrides(
         );
       }
       if (
-        (isExternalModelProvider(provider) || provider === "amazon-bedrock") &&
+        (isExternalModelProvider(provider) ||
+          provider === "amazon-bedrock" ||
+          provider === "ollama") &&
         key === "model_provider"
       ) {
         throw new CodexSecurityError(
@@ -13796,7 +13798,11 @@ export function parseCodexOverrides(
     }
     cursor[final] = parsed;
   }
-  if (isExternalModelProvider(provider) || provider === "amazon-bedrock" || provider === "ollama") {
+  if (
+    isExternalModelProvider(provider) ||
+    provider === "amazon-bedrock" ||
+    provider === "ollama"
+  ) {
     const selectedModel = scanModel(
       mergeCodexOverrides(defaults ?? {}, result),
     );
