@@ -6893,7 +6893,9 @@ export function scanAuthentication(
   if (commandAuth) return { method: "command", verified: false };
   if (isLocalOllamaProvider(modelProvider) && providerEnvKey === undefined) {
     if (auth !== "auto") {
-      throw new ConfigurationError("Local Ollama uses no authentication; select --auth auto.");
+      throw new ConfigurationError(
+        "Local Ollama uses no authentication; select --auth auto.",
+      );
     }
     return { method: "none", verified: false };
   }
@@ -7028,8 +7030,14 @@ export function selectedScanEnvironment(
     : null;
   const selectedProviderKey = providerEnvKey ?? standardProviderKey;
   const bedrockProvider = modelProvider === "amazon-bedrock";
-  const localOllama = isLocalOllamaProvider(modelProvider) && selectedProviderKey === null;
-  if (auth !== "chatgpt" && selectedProviderKey === null && !bedrockProvider && !localOllama) {
+  const localOllama =
+    isLocalOllamaProvider(modelProvider) && selectedProviderKey === null;
+  if (
+    auth !== "chatgpt" &&
+    selectedProviderKey === null &&
+    !bedrockProvider &&
+    !localOllama
+  ) {
     return environment;
   }
   const selected = Object.fromEntries(
