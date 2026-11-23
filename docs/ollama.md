@@ -17,22 +17,17 @@ Ollama must be listening at `http://127.0.0.1:11434` before the scan.
 The local built-in provider needs no OpenAI login or API key. An unrelated
 `OPENAI_API_KEY` or `CODEX_API_KEY` should not authenticate the local model.
 
-To connect to a separate Ollama server, use a native Codex provider definition
-rather than the built-in localhost endpoint:
+To connect to a remote Ollama server over a private network, override the
+native Codex OSS endpoint while retaining its keyless `ollama` provider:
 
 ```sh
-cs scan . --model gpt-oss:20b --auth auto \
-  --codex 'model_provider="ollama-remote"' \
-  --codex 'model_providers.ollama-remote.name="Remote Ollama"' \
-  --codex 'model_providers.ollama-remote.base_url="http://ollama.internal:11434/v1"' \
-  --codex 'model_providers.ollama-remote.wire_api="responses"'
+export CODEX_OSS_BASE_URL="http://ollama.internal:11434/v1"
+cs scan . --provider ollama --model gpt-oss:20b --auth auto
 ```
 
-**Important:** A custom remote provider is not the built-in keyless `ollama`
-provider; configure authentication as needed by the proxy. In particular,
-the current wrapper may require a separately configured provider key or an
-existing Codex sign-in for custom provider IDs. Do not expose a keyless
-Ollama service on the public internet. Prefer a private tunnel or tailnet.
+`CODEX_OSS_BASE_URL` is a native Codex setting. Keep the endpoint inside
+a private network or use an SSH tunnel. Do not expose a keyless Ollama
+server to the public internet.
 
 ## Direct Ollama Cloud
 
