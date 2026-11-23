@@ -7044,7 +7044,8 @@ export function selectedScanEnvironment(
       if (
         key === "OPENROUTER_API_KEY" ||
         key === "FIREWORKS_API_KEY" ||
-        key === "CHEAPER_INFERENCE_API_KEY"
+        key === "CHEAPER_INFERENCE_API_KEY" ||
+        key === "OLLAMA_API_KEY"
       ) {
         return (
           !bedrockProvider &&
