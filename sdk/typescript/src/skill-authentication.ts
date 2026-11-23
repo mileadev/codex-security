@@ -10,6 +10,7 @@ import {
   deepMerge,
   EXTERNAL_CODEX_PROVIDERS,
   isExternalModelProvider,
+  isLocalOllamaProvider,
   modelProviderConfigOverride,
   scanModelProvider,
   type JsonObject,
