@@ -67,6 +67,7 @@ test("local Ollama needs no stored account or environment key", () => {
   }, "auto", "ollama");
   expect(isolated["OPENAI_API_KEY"]).toBeUndefined();
   expect(isolated["CODEX_API_KEY"]).toBeUndefined();
+  expect(isolated["OLLAMA_API_KEY"]).toBeUndefined();
 });
 
 test("Ollama model defaults do not assume OpenAI reasoning summary", async () => {
