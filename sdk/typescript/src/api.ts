@@ -84,6 +84,7 @@ import {
   EXTERNAL_CODEX_PROVIDERS,
   inlineToml,
   isExternalModelProvider,
+  isLocalOllamaProvider,
   hasCommandAuth,
   mergedCodexConfig,
   resolveCodexProfile,
@@ -645,6 +646,7 @@ function patchOutcomeFromResponse(
 export type ScanAuthentication =
   | { method: "host"; verified: false }
   | { method: "command"; verified: false }
+  | { method: "none"; verified: false }
   | {
       method: "api_key";
       source: string;
@@ -2610,6 +2612,7 @@ export class CodexSecurity {
         environmentValue(runtime.environment, "CODEX_MCP_NODE_PATH") ===
           undefined &&
         (modelProvider === "amazon-bedrock" ||
+          authentication.method === "none" ||
           authentication.method === "api_key" ||
           (authentication.method === "stored_credentials" &&
             authentication.credentialType === "api_key")) &&
@@ -5296,7 +5299,8 @@ export class CodexSecurity {
         !runtime.credentialsAvailable &&
         apiKey === null &&
         !commandAuth &&
-        authentication.method !== "aws_credentials"
+        authentication.method !== "aws_credentials" &&
+        authentication.method !== "none"
       ) {
         throw new AuthenticationRequiredError(NO_CREDENTIALS_MESSAGE);
       }
@@ -5946,6 +5950,7 @@ export class CodexSecurity {
       const credentialsAvailable =
         hasCommandAuth(requestedConfig) ||
         providerEnvKey !== undefined ||
+        isLocalOllamaProvider(modelProvider) ||
         modelProvider === "amazon-bedrock"
           ? false
           : await initialCredentialsAvailable(
@@ -6886,6 +6891,14 @@ export function scanAuthentication(
     );
   }
   if (commandAuth) return { method: "command", verified: false };
+  if (isLocalOllamaProvider(modelProvider) && providerEnvKey === undefined) {
+    if (auth !== "auto") {
+      throw new ConfigurationError(
+        "Local Ollama uses no authentication; select --auth auto.",
+      );
+    }
+    return { method: "none", verified: false };
+  }
   if (modelProvider === "amazon-bedrock") {
     const sources = [
       "AWS_BEARER_TOKEN_BEDROCK",
@@ -7017,7 +7030,14 @@ export function selectedScanEnvironment(
     : null;
   const selectedProviderKey = providerEnvKey ?? standardProviderKey;
   const bedrockProvider = modelProvider === "amazon-bedrock";
-  if (auth !== "chatgpt" && selectedProviderKey === null && !bedrockProvider) {
+  const localOllama =
+    isLocalOllamaProvider(modelProvider) && selectedProviderKey === null;
+  if (
+    auth !== "chatgpt" &&
+    selectedProviderKey === null &&
+    !bedrockProvider &&
+    !localOllama
+  ) {
     return environment;
   }
   const selected = Object.fromEntries(
@@ -7032,9 +7052,11 @@ export function selectedScanEnvironment(
       if (
         key === "OPENROUTER_API_KEY" ||
         key === "FIREWORKS_API_KEY" ||
-        key === "CHEAPER_INFERENCE_API_KEY"
+        key === "CHEAPER_INFERENCE_API_KEY" ||
+        key === "OLLAMA_API_KEY"
       ) {
         return (
+          !localOllama &&
           !bedrockProvider &&
           (selectedProviderKey === null ||
             key === standardProviderKey ||
