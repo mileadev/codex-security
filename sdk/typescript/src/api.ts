@@ -7056,6 +7056,7 @@ export function selectedScanEnvironment(
         key === "OLLAMA_API_KEY"
       ) {
         return (
+          !localOllama &&
           !bedrockProvider &&
           (selectedProviderKey === null ||
             key === standardProviderKey ||
