@@ -577,6 +577,7 @@ const PROVIDER_OPTION = z
     "fireworks",
     "cheaperinference",
     "ollama-cloud",
+    "ollama",
     "amazon-bedrock",
   ])
   .default("openai")
@@ -13721,7 +13722,7 @@ export function parseCodexOverrides(
   values: readonly string[],
   model?: string,
   effort?: ModelCliOptions["effort"],
-  provider?: "openai" | "amazon-bedrock" | ExternalModelProvider,
+  provider?: "openai" | "amazon-bedrock" | "ollama" | ExternalModelProvider,
   defaults?: JsonObject,
 ): JsonObject {
   const result = Object.create(null) as JsonObject;
@@ -13732,7 +13733,7 @@ export function parseCodexOverrides(
     result["model_providers"] = {
       [provider]: { ...EXTERNAL_CODEX_PROVIDERS[provider] },
     };
-  } else if (provider === "amazon-bedrock") {
+  } else if (provider === "amazon-bedrock" || provider === "ollama") {
     result["model_provider"] = provider;
   }
   for (const value of values) {
@@ -13795,7 +13796,7 @@ export function parseCodexOverrides(
     }
     cursor[final] = parsed;
   }
-  if (isExternalModelProvider(provider) || provider === "amazon-bedrock") {
+  if (isExternalModelProvider(provider) || provider === "amazon-bedrock" || provider === "ollama") {
     const selectedModel = scanModel(
       mergeCodexOverrides(defaults ?? {}, result),
     );
