@@ -51,12 +51,6 @@ export const OLLAMA_CLOUD_CODEX_PROVIDER = {
   wire_api: "responses",
 } as const satisfies JsonObject;
 
-export const OLLAMA_LOCAL_CODEX_PROVIDER = {
-  name: "Ollama (local)",
-  base_url: "http://127.0.0.1:11434/v1",
-  wire_api: "responses",
-} as const satisfies JsonObject;
-
 export const EXTERNAL_CODEX_PROVIDERS = {
   openrouter: OPENROUTER_CODEX_PROVIDER,
   fireworks: FIREWORKS_CODEX_PROVIDER,
@@ -76,7 +70,7 @@ export function isExternalModelProvider(
 }
 
 export function isLocalOllamaProvider(provider: unknown): boolean {
-  return provider === "ollama" || provider === "ollama-local";
+  return provider === "ollama";
 }
 
 export const MODEL_FILE_SETTINGS = [
@@ -525,6 +519,10 @@ export async function mergedCodexConfig(
   }
   if (selectedProvider === "ollama-cloud" || isLocalOllamaProvider(selectedProvider)) {
     defaults["model_reasoning_effort"] = "medium";
+  }
+  if (selectedProvider === "ollama-cloud") {
+    // Direct Cloud Responses does not provide built-in web search.
+    defaults["web_search"] = "disabled";
   }
   return deepMerge(defaults, effectiveOverrides);
 }
