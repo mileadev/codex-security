@@ -44,10 +44,24 @@ export const CHEAPERINFERENCE_CODEX_PROVIDER = {
   wire_api: "responses",
 } as const satisfies JsonObject;
 
+export const OLLAMA_CLOUD_CODEX_PROVIDER = {
+  name: "Ollama Cloud",
+  base_url: "https://ollama.com/v1",
+  env_key: "OLLAMA_API_KEY",
+  wire_api: "responses",
+} as const satisfies JsonObject;
+
+export const OLLAMA_LOCAL_CODEX_PROVIDER = {
+  name: "Ollama (local)",
+  base_url: "http://127.0.0.1:11434/v1",
+  wire_api: "responses",
+} as const satisfies JsonObject;
+
 export const EXTERNAL_CODEX_PROVIDERS = {
   openrouter: OPENROUTER_CODEX_PROVIDER,
   fireworks: FIREWORKS_CODEX_PROVIDER,
   cheaperinference: CHEAPERINFERENCE_CODEX_PROVIDER,
+  "ollama-cloud": OLLAMA_CLOUD_CODEX_PROVIDER,
 } as const;
 
 export type ExternalModelProvider = keyof typeof EXTERNAL_CODEX_PROVIDERS;
@@ -59,6 +73,10 @@ export function isExternalModelProvider(
     typeof provider === "string" &&
     Object.hasOwn(EXTERNAL_CODEX_PROVIDERS, provider)
   );
+}
+
+export function isLocalOllamaProvider(provider: unknown): boolean {
+  return provider === "ollama" || provider === "ollama-local";
 }
 
 export const MODEL_FILE_SETTINGS = [
@@ -501,9 +519,12 @@ export async function mergedCodexConfig(
     );
   const effectiveOverrides = deepMerge(nativeProfile, overrides);
   validateNativeMultiAgentV2Overrides(effectiveOverrides);
-  if (scanModelProvider(effectiveOverrides) === "amazon-bedrock") {
-    // Bedrock models can reject reasoning.summary before the scan starts.
+  const selectedProvider = scanModelProvider(effectiveOverrides);
+  if (selectedProvider === "amazon-bedrock" || selectedProvider === "ollama-cloud" || isLocalOllamaProvider(selectedProvider)) {
     defaults["model_reasoning_summary"] = "none";
+  }
+  if (selectedProvider === "ollama-cloud" || isLocalOllamaProvider(selectedProvider)) {
+    defaults["model_reasoning_effort"] = "medium";
   }
   return deepMerge(defaults, effectiveOverrides);
 }
