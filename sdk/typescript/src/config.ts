@@ -514,10 +514,17 @@ export async function mergedCodexConfig(
   const effectiveOverrides = deepMerge(nativeProfile, overrides);
   validateNativeMultiAgentV2Overrides(effectiveOverrides);
   const selectedProvider = scanModelProvider(effectiveOverrides);
-  if (selectedProvider === "amazon-bedrock" || selectedProvider === "ollama-cloud" || isLocalOllamaProvider(selectedProvider)) {
+  if (
+    selectedProvider === "amazon-bedrock" ||
+    selectedProvider === "ollama-cloud" ||
+    isLocalOllamaProvider(selectedProvider)
+  ) {
     defaults["model_reasoning_summary"] = "none";
   }
-  if (selectedProvider === "ollama-cloud" || isLocalOllamaProvider(selectedProvider)) {
+  if (
+    selectedProvider === "ollama-cloud" ||
+    isLocalOllamaProvider(selectedProvider)
+  ) {
     defaults["model_reasoning_effort"] = "medium";
   }
   if (selectedProvider === "ollama-cloud") {
