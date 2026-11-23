@@ -350,6 +350,9 @@ export CHEAPER_INFERENCE_API_KEY="<your-cheaper-inference-api-key>"
 codex-security scan . --provider cheaperinference --model gpt-5.4
 ```
 
+For keyless local Ollama (including remote private endpoints) and direct
+Ollama Cloud with `OLLAMA_API_KEY`, see [Ollama setup](../../../docs/ollama.md).
+
 For Opper, save this profile in `$CODEX_HOME/opper.config.toml`
 (default `~/.codex/opper.config.toml`). Opper requires `web_search = "disabled"`.
 
