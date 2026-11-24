@@ -234,6 +234,7 @@ for examples. For local and Cloud Ollama inference, see [Ollama setup](docs/olla
 - [CLI reference](sdk/typescript/docs/cli.md)
 - [Imported finding identity and evidence](docs/scanner-imports/schema-guide.md)
 - [Project configuration](docs/project-configuration.md)
+- [Validation providers](docs/validation-providers.md)
 - [Examples](examples/README.md)
 
 To report a vulnerability privately, follow the [security policy](SECURITY.md).
